@@ -5,6 +5,7 @@ from pathlib import Path
 import sys
 
 import pandas as pd
+import requests
 import streamlit as st
 
 sys.path.insert(0, str(Path(__file__).parent / "src"))
@@ -69,6 +70,8 @@ st.markdown(
     .profile { background:linear-gradient(100deg,rgba(124,58,237,.16),rgba(236,72,153,.09)); border:1px solid #3a2f51; border-radius:18px; padding:1rem 1.2rem; color:#c9c3d5; margin:.25rem 0 1.25rem; }
     .profile strong { color:#fff; }
     .footer { color:#716b80; font-size:.78rem; text-align:center; padding:2rem 0 1rem; }
+    [data-testid="stImage"] img { border-radius:13px; aspect-ratio:1; object-fit:cover; }
+    [data-testid="stLinkButton"] a { border-radius:999px; text-decoration:none; }
     .stMultiSelect [data-baseweb="tag"] { background:#6d28d9; }
     [data-baseweb="select"] > div, [data-baseweb="input"] { background:#181323 !important; border-color:#3a314c !important; color:#f7f4ff !important; }
     [data-testid="stFileUploaderDropzone"] { background:#17131f !important; border:1px dashed #493e60 !important; border-radius:14px; }
@@ -93,6 +96,43 @@ def taste_description(seeds: pd.DataFrame) -> str:
     return f"A <strong>{mood}</strong>, <strong>{pace}</strong> taste with a {texture} edge."
 
 
+MOODS = {
+    "Balanced": {},
+    "⚡ Energize": {"energy": 0.9, "danceability": 0.78, "valence": 0.7},
+    "☁️ Chill": {"energy": 0.28, "acousticness": 0.62, "valence": 0.48},
+    "☀️ Feel good": {"valence": 0.9, "danceability": 0.74, "energy": 0.68},
+    "🌿 Acoustic": {"acousticness": 0.9, "energy": 0.38, "instrumentalness": 0.15},
+}
+
+
+@st.cache_data(ttl=86_400, show_spinner=False)
+def apple_artwork(title: str, artist: str) -> tuple[str | None, str | None]:
+    """Return streamed artwork and its required nearby Apple Store link."""
+    try:
+        response = requests.get(
+            "https://itunes.apple.com/search",
+            params={
+                "term": f"{artist.split(';')[0]} {title}",
+                "media": "music",
+                "entity": "song",
+                "limit": 1,
+                "country": "US",
+            },
+            timeout=2.5,
+        )
+        response.raise_for_status()
+        results = response.json().get("results", [])
+        if not results:
+            return None, None
+        result = results[0]
+        artwork = result.get("artworkUrl100")
+        if artwork:
+            artwork = artwork.replace("100x100bb", "300x300bb")
+        return artwork, result.get("trackViewUrl")
+    except (requests.RequestException, ValueError):
+        return None, None
+
+
 default_path = Path(__file__).parent / "data" / "music_catalog.csv"
 
 with st.sidebar:
@@ -103,6 +143,8 @@ with st.sidebar:
 
 catalog = pd.read_csv(uploaded if uploaded else default_path)
 catalog["label"] = catalog["title"] + " — " + catalog["artist"]
+st.session_state.setdefault("liked_tracks", set())
+st.session_state.setdefault("dismissed_tracks", set())
 
 with st.sidebar:
     st.markdown("### Build your taste profile")
@@ -114,7 +156,15 @@ with st.sidebar:
         max_selections=5,
         placeholder="Search songs or artists",
     )
+    mood = st.selectbox("Tune the mood", list(MOODS), help="Gently steers the audio profile without ignoring your favorite tracks.")
     n = st.slider("Playlist length", 3, 12, 6)
+    if st.session_state.liked_tracks:
+        st.caption(f"♥ {len(st.session_state.liked_tracks)} liked this session")
+    if st.session_state.dismissed_tracks and st.button(
+        "Reset dismissed tracks", use_container_width=True
+    ):
+        st.session_state.dismissed_tracks = set()
+        st.rerun()
     st.divider()
     st.caption(f"{len(catalog):,} tracks  ·  {catalog['genre'].nunique()} genres")
 
@@ -142,25 +192,69 @@ if choices:
         unsafe_allow_html=True,
     )
     seed_ids = seed_rows["track_id"].astype(str).tolist()
-    recommendations = MusicRecommender().fit(catalog).recommend(seed_ids, n=n)
+    recommendations = MusicRecommender().fit(catalog).recommend(
+        seed_ids,
+        n=n,
+        feature_targets=MOODS[mood],
+        exclude_track_ids=st.session_state.dismissed_tracks,
+        max_per_artist=1,
+    )
     rows = [st.columns(2) for _ in range((len(recommendations) + 1) // 2)]
     for index, recommendation in recommendations.iterrows():
         column = rows[index // 2][index % 2]
         with column:
             with st.container(border=True):
                 score = min(100, round(recommendation["score"] * 100))
-                st.markdown(
-                    f"""
-                    <div class="section-label">#{index + 1:02d} · {escape(recommendation['match_reason'])}</div>
-                    <div class="track-title">{escape(str(recommendation['title']))}</div>
-                    <div class="track-artist">{escape(str(recommendation['artist']))}</div>
-                    <div class="track-meta">
-                      <span class="genre-pill">{escape(str(recommendation['genre']))}</span>
-                      <span class="match">{score}% match</span>
-                    </div>
-                    """,
-                    unsafe_allow_html=True,
+                track_id = str(recommendation["track_id"])
+                artwork_url, apple_url = apple_artwork(
+                    str(recommendation["title"]), str(recommendation["artist"])
                 )
+                art_col, info_col = st.columns([1, 2.1])
+                with art_col:
+                    if artwork_url:
+                        st.image(artwork_url, use_container_width=True)
+                    else:
+                        st.markdown("### 🎵")
+                with info_col:
+                    st.markdown(
+                        f"""
+                        <div class="section-label">#{index + 1:02d} · {escape(recommendation['match_reason'])}</div>
+                        <div class="track-title">{escape(str(recommendation['title']))}</div>
+                        <div class="track-artist">{escape(str(recommendation['artist']))}</div>
+                        <div class="track-meta">
+                          <span class="genre-pill">{escape(str(recommendation['genre']))}</span>
+                          <span class="match">{score}% match</span>
+                        </div>
+                        """,
+                        unsafe_allow_html=True,
+                    )
+                play_col, like_col, dismiss_col = st.columns([1.3, 1, 1])
+                with play_col:
+                    st.link_button(
+                        "▶ Spotify",
+                        f"https://open.spotify.com/track/{track_id}",
+                        use_container_width=True,
+                    )
+                with like_col:
+                    liked = track_id in st.session_state.liked_tracks
+                    if st.button(
+                        "♥ Liked" if liked else "♡ Like",
+                        key=f"like_{track_id}",
+                        use_container_width=True,
+                    ):
+                        if liked:
+                            st.session_state.liked_tracks.remove(track_id)
+                        else:
+                            st.session_state.liked_tracks.add(track_id)
+                        st.rerun()
+                with dismiss_col:
+                    if st.button(
+                        "Skip", key=f"skip_{track_id}", use_container_width=True
+                    ):
+                        st.session_state.dismissed_tracks.add(track_id)
+                        st.rerun()
+                if apple_url:
+                    st.caption(f"[Artwork via Apple · View in iTunes]({apple_url})")
 else:
     st.info("Choose at least one favorite track in the sidebar to build your mix.")
 

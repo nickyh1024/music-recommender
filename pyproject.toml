@@ -7,7 +7,7 @@ name = "music-recommender"
 version = "0.1.0"
 description = "Explainable content-based music recommendation app"
 requires-python = ">=3.11"
-dependencies = ["numpy>=1.26", "pandas>=2.1", "streamlit>=1.35"]
+dependencies = ["numpy>=1.26", "pandas>=2.1", "requests>=2.31", "streamlit>=1.35"]
 
 [tool.setuptools.packages.find]
 where = ["src"]

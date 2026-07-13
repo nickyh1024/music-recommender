@@ -9,6 +9,14 @@ catalog of 12,000 popular Spotify tracks. Choose songs you like
 and the model recommends unseen tracks based on normalized audio similarity,
 genre overlap, and a small popularity tie-breaker.
 
+## Product features
+
+- Open every recommendation directly in Spotify.
+- Steer a mix toward energetic, chill, feel-good, or acoustic moods.
+- Like or dismiss tracks during a session and immediately refresh the ranking.
+- Limit repeated primary artists for more varied discovery.
+- Show streamed album artwork from the iTunes Search API with store attribution.
+
 ## Quick start
 
 Requires Python 3.11 or newer.
@@ -37,13 +45,12 @@ features only; it does not redistribute audio. Download the source CSV and run:
 python scripts/prepare_spotify.py /path/to/spotify-tracks-dataset-detailed.csv
 ```
 
-`genre_hit_rate_at_k` provides a deterministic offline diagnostic: whether at
-least one of the top-K recommendations shares the seed track's genre. Genre is
-only a proxy for relevance, not a substitute for evaluation with real users.
+`evaluate_recommender` reports genre hit rate, artist diversity, and catalog
+coverage at K. These are deterministic offline diagnostics; genre is only a
+proxy for relevance, not a substitute for evaluation with real users.
 
 ## Roadmap
 
-- Add direct Spotify links and album artwork.
 - Collect likes, skips, and listening history.
-- Add collaborative filtering and offline ranking evaluation.
+- Persist feedback and add collaborative filtering.
 - Combine content and behavioral signals in a hybrid recommender.

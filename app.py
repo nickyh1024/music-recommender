@@ -1,0 +1,30 @@
+"""Interactive music recommendation demo."""
+
+from pathlib import Path
+
+import pandas as pd
+import streamlit as st
+
+from musicrec import MusicRecommender
+
+st.set_page_config(page_title="Music Recommender", page_icon="🎧", layout="wide")
+st.title("Music Recommender")
+st.caption("Choose songs you like to create a taste profile.")
+
+default_path = Path(__file__).parent / "data" / "music_catalog.csv"
+uploaded = st.file_uploader("Optional: upload your own catalog CSV", type="csv")
+catalog = pd.read_csv(uploaded if uploaded else default_path)
+catalog["label"] = catalog["title"] + " — " + catalog["artist"]
+choices = st.multiselect("Songs you like", catalog["label"], default=catalog["label"].head(1).tolist())
+n = st.slider("Number of recommendations", 1, min(10, len(catalog) - 1), min(5, len(catalog) - 1))
+
+if choices:
+    seed_ids = catalog.loc[catalog["label"].isin(choices), "track_id"].astype(str).tolist()
+    recommendations = MusicRecommender().fit(catalog).recommend(seed_ids, n=n)
+    recommendations["match"] = recommendations["score"].map(lambda value: f"{value:.0%}")
+    st.subheader("Recommended for you")
+    st.dataframe(recommendations[["title", "artist", "genre", "match", "match_reason"]], hide_index=True, width="stretch")
+else:
+    st.info("Choose at least one song to get recommendations.")
+
+st.caption("The bundled catalog is fictional demo data. Upload a real catalog with the same columns to replace it.")

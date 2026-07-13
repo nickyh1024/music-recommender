@@ -1,0 +1,13 @@
+track_id,title,artist,genre,danceability,energy,valence,acousticness,instrumentalness,tempo,popularity
+demo01,Neon Avenue,Luma,pop,0.82,0.78,0.86,0.10,0.00,122,82
+demo02,Saturday Light,Paper Planes,pop,0.79,0.74,0.81,0.15,0.00,119,76
+demo03,Midnight Signal,Nova Club,electronic,0.76,0.88,0.55,0.03,0.36,128,73
+demo04,Afterglow Circuit,Nova Club,electronic,0.72,0.84,0.48,0.04,0.51,126,68
+demo05,Porchlight Stories,June Harbor,folk,0.39,0.31,0.58,0.86,0.02,91,64
+demo06,Old Pine Road,The Wayfarers,folk,0.35,0.28,0.47,0.91,0.08,84,59
+demo07,Concrete Thunder,Static Hearts,rock,0.46,0.94,0.37,0.03,0.01,151,79
+demo08,Open Highway,Static Hearts,rock,0.52,0.87,0.61,0.07,0.00,144,72
+demo09,Blue Room,Miles North,jazz,0.48,0.36,0.42,0.63,0.68,102,57
+demo10,Velvet Steps,Miles North,jazz,0.55,0.41,0.51,0.52,0.59,108,54
+demo11,Slow Orbit,Aster,ambient,0.18,0.16,0.22,0.80,0.92,70,48
+demo12,Driftglass,Aster,ambient,0.21,0.20,0.28,0.74,0.88,74,51

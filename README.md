@@ -4,8 +4,8 @@
 
 **Live app:** https://byi8omgknvvsd36njg7qlz.streamlit.app/
 
-An explainable content-based music recommendation app built with real metadata
-from the Free Music Archive (FMA). Choose songs you like
+An explainable content-based music recommendation app built with a curated
+catalog of 12,000 popular Spotify tracks. Choose songs you like
 and the model recommends unseen tracks based on normalized audio similarity,
 genre overlap, and a small popularity tie-breaker.
 
@@ -22,19 +22,19 @@ streamlit run app.py
 
 Run tests with `python -m unittest discover -s tests -v`.
 
-The bundled catalog is a compact, genre-balanced sample of FMA tracks. You can upload another CSV
+The bundled catalog contains the most popular unique tracks from a 114K-track
+Kaggle dataset. You can upload another CSV
 with `track_id`, `title`, `artist`, `genre`, `danceability`, `energy`, `valence`,
 `acousticness`, `instrumentalness`, `tempo`, and optional `popularity` (0–100).
 
 ## Data
 
-FMA contains 106,574 Creative Commons-licensed tracks. This project uses track
-metadata and Echo Nest audio features from its CC BY 4.0 metadata release; it
-does not redistribute audio. The committed catalog can be reproduced by
-downloading `fma_metadata.zip` from the official FMA repository and running:
+The default catalog is derived from the CC0-licensed **Spotify Tracks Dataset —
+114K Songs Across 114 Genres** on Kaggle. The project stores metadata and audio
+features only; it does not redistribute audio. Download the source CSV and run:
 
 ```bash
-python scripts/prepare_fma.py /path/to/fma_metadata
+python scripts/prepare_spotify.py /path/to/spotify-tracks-dataset-detailed.csv
 ```
 
 `genre_hit_rate_at_k` provides a deterministic offline diagnostic: whether at
@@ -43,7 +43,7 @@ only a proxy for relevance, not a substitute for evaluation with real users.
 
 ## Roadmap
 
-- Replace the demo catalog with licensed or user-provided music metadata.
+- Add direct Spotify links and album artwork.
 - Collect likes, skips, and listening history.
 - Add collaborative filtering and offline ranking evaluation.
 - Combine content and behavioral signals in a hybrid recommender.

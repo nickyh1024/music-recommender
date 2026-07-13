@@ -18,7 +18,7 @@ default_path = Path(__file__).parent / "data" / "music_catalog.csv"
 uploaded = st.file_uploader("Optional: upload your own catalog CSV", type="csv")
 catalog = pd.read_csv(uploaded if uploaded else default_path)
 catalog["label"] = catalog["title"] + " — " + catalog["artist"]
-source = "your uploaded catalog" if uploaded else "the Free Music Archive"
+source = "your uploaded catalog" if uploaded else "the Kaggle Spotify Tracks dataset"
 st.caption(f"Searching {len(catalog):,} tracks across {catalog['genre'].nunique()} genres from {source}.")
 choices = st.multiselect("Songs you like", catalog["label"], default=catalog["label"].head(1).tolist())
 n = st.slider("Number of recommendations", 1, min(10, len(catalog) - 1), min(5, len(catalog) - 1))
@@ -33,6 +33,6 @@ else:
     st.info("Choose at least one song to get recommendations.")
 
 st.caption(
-    "The bundled catalog uses real FMA metadata and redistributes no audio. "
+    "The bundled catalog uses real Spotify track metadata and redistributes no audio. "
     "Upload another catalog with the same columns to replace it."
 )

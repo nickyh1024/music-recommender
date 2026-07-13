@@ -31,22 +31,30 @@ st.markdown(
           #0b0911;
         color: var(--ink);
     }
+    [data-testid="stHeader"] { background: rgba(11,9,17,.82); border-bottom: 1px solid rgba(255,255,255,.04); }
+    [data-testid="stToolbar"] { right: 1rem; }
+    .block-container { max-width: 1240px; padding-top: 1.5rem; padding-bottom: 2rem; }
     html, body, [class*="css"] { font-family: "DM Sans", sans-serif; }
-    h1, h2, h3 { font-family: "Manrope", sans-serif !important; letter-spacing: -.035em; }
+    h1, h2, h3 { font-family: "Manrope", sans-serif !important; letter-spacing: -.035em; color:#f8f6ff !important; }
+    p, label, [data-testid="stCaptionContainer"] { color:#b6b0c4; }
     [data-testid="stSidebar"] { background: rgba(17,14,27,.92); border-right: 1px solid #292337; }
-    [data-testid="stSidebar"] > div { padding-top: 1.75rem; }
+    [data-testid="stSidebar"] > div { padding-top: 1.35rem; }
+    [data-testid="stSidebar"] h3 { font-size:1.05rem; margin-top:.6rem; }
+    [data-testid="stSidebar"] label, [data-testid="stSidebar"] p { color:#bcb5ca !important; }
     [data-testid="stMetric"] {
         background: rgba(25,20,38,.72); border: 1px solid #302942;
         border-radius: 16px; padding: .9rem 1rem;
     }
+    [data-testid="stMetricLabel"] p { color:#aaa3b8 !important; }
+    [data-testid="stMetricValue"] { color:#f6f2ff !important; font:700 1.85rem "Manrope"; }
     [data-testid="stVerticalBlockBorderWrapper"] {
         background: linear-gradient(145deg, rgba(31,25,46,.88), rgba(18,15,28,.88));
         border: 1px solid #342d46 !important; border-radius: 18px !important;
         box-shadow: 0 18px 50px rgba(0,0,0,.16);
     }
-    .hero { padding: 2.2rem 0 1.4rem; max-width: 850px; }
+    .hero { padding: 1.8rem 0 1.2rem; max-width: 760px; }
     .eyebrow { color: #c4b5fd; font-weight: 700; letter-spacing: .12em; font-size: .75rem; text-transform: uppercase; }
-    .hero h1 { font-size: clamp(2.65rem, 6vw, 5.4rem); line-height: .98; margin: .55rem 0 1rem; }
+    .hero h1 { font-size: clamp(2.65rem, 5vw, 4.55rem); line-height: 1.01; margin: .55rem 0 1rem; }
     .gradient-text { background: linear-gradient(95deg,#c4b5fd,#f9a8d4); -webkit-background-clip:text; color:transparent; }
     .hero-copy { color: var(--muted); font-size: 1.08rem; max-width: 640px; line-height: 1.65; }
     .brand { font: 800 1.3rem "Manrope"; margin-bottom: .2rem; }
@@ -62,6 +70,11 @@ st.markdown(
     .profile strong { color:#fff; }
     .footer { color:#716b80; font-size:.78rem; text-align:center; padding:2rem 0 1rem; }
     .stMultiSelect [data-baseweb="tag"] { background:#6d28d9; }
+    [data-baseweb="select"] > div, [data-baseweb="input"] { background:#181323 !important; border-color:#3a314c !important; color:#f7f4ff !important; }
+    [data-testid="stFileUploaderDropzone"] { background:#17131f !important; border:1px dashed #493e60 !important; border-radius:14px; }
+    [data-testid="stFileUploaderDropzone"] button { background:#241c34; color:#eee9f8; border-color:#493e60; }
+    [data-testid="stFileUploaderDropzoneInstructions"] span, [data-testid="stFileUploaderDropzoneInstructions"] small { color:#9e97ac !important; }
+    [data-testid="stSlider"] [role="slider"] { background:#c4b5fd; }
     .stButton > button { border-radius:999px; border-color:#463b60; }
     @media (max-width: 700px) { .hero { padding-top:1rem; } .hero h1 { font-size:2.65rem; } }
     </style>
@@ -85,7 +98,8 @@ default_path = Path(__file__).parent / "data" / "music_catalog.csv"
 with st.sidebar:
     st.markdown('<div class="brand">Sound<span>Scout</span></div>', unsafe_allow_html=True)
     st.markdown('<div class="side-copy">Your taste, translated into sound.</div>', unsafe_allow_html=True)
-    uploaded = st.file_uploader("Use your own catalog", type="csv")
+    with st.expander("Use your own catalog"):
+        uploaded = st.file_uploader("Upload a CSV", type="csv", label_visibility="collapsed")
 
 catalog = pd.read_csv(uploaded if uploaded else default_path)
 catalog["label"] = catalog["title"] + " — " + catalog["artist"]

@@ -5,7 +5,7 @@
 **Live app:** https://byi8omgknvvsd36njg7qlz.streamlit.app/
 
 An explainable content-based music recommendation app built with a curated
-catalog of 12,000 popular Spotify tracks. Choose songs you like
+catalog of 40,000 popular Spotify tracks. Choose songs you like
 and the model recommends unseen tracks based on normalized audio similarity,
 genre overlap, and a small popularity tie-breaker.
 

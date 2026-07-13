@@ -18,7 +18,7 @@ FEATURES = [
 ]
 
 
-def prepare(source: Path, output: Path, max_tracks: int = 12_000) -> pd.DataFrame:
+def prepare(source: Path, output: Path, max_tracks: int = 40_000) -> pd.DataFrame:
     raw = pd.read_csv(source)
     required = {
         "track_id",
@@ -50,7 +50,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("source", type=Path)
     parser.add_argument("--output", type=Path, default=Path("data/music_catalog.csv"))
-    parser.add_argument("--max-tracks", type=int, default=12_000)
+    parser.add_argument("--max-tracks", type=int, default=40_000)
     args = parser.parse_args()
     result = prepare(args.source, args.output, args.max_tracks)
     print(

@@ -1,5 +1,9 @@
 # Music Recommender
 
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://byi8omgknvvsd36njg7qlz.streamlit.app/)
+
+**Live app:** https://byi8omgknvvsd36njg7qlz.streamlit.app/
+
 An explainable content-based music recommendation app built with real metadata
 from the Free Music Archive (FMA). Choose songs you like
 and the model recommends unseen tracks based on normalized audio similarity,

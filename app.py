@@ -32,4 +32,7 @@ if choices:
 else:
     st.info("Choose at least one song to get recommendations.")
 
-st.caption("The bundled catalog is fictional demo data. Upload a real catalog with the same columns to replace it.")
+st.caption(
+    "The bundled catalog uses real FMA metadata and redistributes no audio. "
+    "Upload another catalog with the same columns to replace it."
+)

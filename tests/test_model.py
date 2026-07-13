@@ -2,7 +2,7 @@ import unittest
 
 import pandas as pd
 
-from musicrec import MusicRecommender
+from musicrec import MusicRecommender, genre_hit_rate_at_k
 
 
 class MusicRecommenderTests(unittest.TestCase):
@@ -21,6 +21,11 @@ class MusicRecommenderTests(unittest.TestCase):
     def test_rejects_unknown_seed(self):
         with self.assertRaisesRegex(ValueError, "Unknown track_id"):
             MusicRecommender().fit(self.catalog).recommend(["missing"])
+
+    def test_genre_hit_rate_is_bounded(self):
+        result = genre_hit_rate_at_k(self.catalog, k=1, sample_size=3)
+        self.assertGreaterEqual(result, 0)
+        self.assertLessEqual(result, 1)
 
 
 if __name__ == "__main__":

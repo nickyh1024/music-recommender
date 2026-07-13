@@ -50,7 +50,11 @@ class MusicRecommender:
         genre_match = self.catalog_["genre"].str.lower().isin(seed_genres).astype(float).to_numpy()
         popularity = pd.to_numeric(self.catalog_.get("popularity", 0), errors="coerce")
         popularity_score = (popularity.fillna(0).clip(0, 100).to_numpy() / 100 if not np.isscalar(popularity) else np.zeros(len(self.catalog_)))
-        score = audio_similarity + self.genre_weight * genre_match + self.popularity_weight * popularity_score
+        score = (
+            audio_similarity
+            + self.genre_weight * genre_match
+            + self.popularity_weight * popularity_score
+        ) / (1 + self.genre_weight + self.popularity_weight)
         candidates = self.catalog_.loc[~seed_mask].copy()
         candidates["score"] = score[~seed_mask]
         candidates["match_reason"] = np.where(genre_match[~seed_mask] > 0, "Similar sound and genre", "Similar audio profile")

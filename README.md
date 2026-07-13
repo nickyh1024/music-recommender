@@ -1,6 +1,7 @@
 # Music Recommender
 
-An explainable content-based music recommendation app. Choose songs you like
+An explainable content-based music recommendation app built with real metadata
+from the Free Music Archive (FMA). Choose songs you like
 and the model recommends unseen tracks based on normalized audio similarity,
 genre overlap, and a small popularity tie-breaker.
 
@@ -17,9 +18,24 @@ streamlit run app.py
 
 Run tests with `python -m unittest discover -s tests -v`.
 
-The bundled catalog contains fictional demo data. You can upload a real CSV
+The bundled catalog is a compact, genre-balanced sample of FMA tracks. You can upload another CSV
 with `track_id`, `title`, `artist`, `genre`, `danceability`, `energy`, `valence`,
 `acousticness`, `instrumentalness`, `tempo`, and optional `popularity` (0–100).
+
+## Data
+
+FMA contains 106,574 Creative Commons-licensed tracks. This project uses track
+metadata and Echo Nest audio features from its CC BY 4.0 metadata release; it
+does not redistribute audio. The committed catalog can be reproduced by
+downloading `fma_metadata.zip` from the official FMA repository and running:
+
+```bash
+python scripts/prepare_fma.py /path/to/fma_metadata
+```
+
+`genre_hit_rate_at_k` provides a deterministic offline diagnostic: whether at
+least one of the top-K recommendations shares the seed track's genre. Genre is
+only a proxy for relevance, not a substitute for evaluation with real users.
 
 ## Roadmap
 

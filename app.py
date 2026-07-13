@@ -1,9 +1,12 @@
 """Interactive music recommendation demo."""
 
 from pathlib import Path
+import sys
 
 import pandas as pd
 import streamlit as st
+
+sys.path.insert(0, str(Path(__file__).parent / "src"))
 
 from musicrec import MusicRecommender
 
